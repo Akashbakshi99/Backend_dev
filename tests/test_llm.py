@@ -29,5 +29,5 @@ def test_generate_ai_result_mock_mode_returns_valid_result(monkeypatch):
     from app.core.config import get_settings
     get_settings.cache_clear()
     result = generate_ai_result(LEAD)
-    assert result.department in {"Web", "Mobile", "AI/Automation", "Consulting", "Other", "Other (Review)"}
+    assert result.department in {"Web", "Mobile", "AI/Automation", "Consulting", "Other"}
     assert result.questions

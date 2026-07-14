@@ -8,17 +8,15 @@ from app.services.odoo import log_lead
 
 app = FastAPI(title="AI Lead Automation")
 
-
+# Health
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+#Entry point
 @app.post("/webhook/lead")
-def webhook_lead(
-    form: InboundForm,
-    background: BackgroundTasks,
-    x_webhook_secret: str | None = Header(default=None),
+def webhook_lead(form: InboundForm,background: BackgroundTasks,x_webhook_secret: str | None = Header(default=None),
 ) -> dict:
     settings = get_settings()
     if x_webhook_secret != settings.webhook_secret:

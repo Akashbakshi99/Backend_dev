@@ -15,6 +15,7 @@ def normalize(form: InboundForm) -> NormalizedLead:
         email=form.email,
         message=clean(form.message) or "",
         subject=clean(form.subject),
+        phone=clean(form.phone),
     )
 
 

@@ -42,4 +42,4 @@ def test_webhook_handles_vague_lead(client):
     body = resp.json()
     assert body["status"] == "accepted"
     assert body["category"] == "needs_clarification"
-    assert body["department"] == "Other (Review)"
+    assert body["department"] == "Other"

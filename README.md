@@ -18,8 +18,10 @@ On `POST /webhook/lead` (a WordPress-form-shaped payload):
 5. Emails the prospect a contextual reply — referencing their inquiry,
    attaching the **Company Profile PDF**, and embedding the AI-generated
    questions — sent from `akashbakshi.ai@gmail.com`.
-6. Logs the lead into **Odoo CRM** (`crm.lead`) with routing notes for the
-   mapped department.
+6. Logs the lead into **Odoo CRM** (`crm.lead`), routed to the correct
+   **Sales Team** (`team_id`) for the mapped department, with the customer's
+   **phone** carried through from the payload and **priority** set
+   automatically from the AI's confidence.
 7. Steps 5–6 run as decoupled background tasks — the customer email never
    waits on Odoo, and vice versa.
 
@@ -28,11 +30,10 @@ On `POST /webhook/lead` (a WordPress-form-shaped payload):
 | Concern | Choice | Why |
 |---|---|---|
 | Service | **Python + FastAPI** | Native LLM ecosystem, fast to build, clean structure for review. |
-| LLM | **Google Gemini** (`gemini-2.0-flash`, free tier) | Zero cost, provider-agnostic wrapper so it can be swapped in one place. |
+| LLM | **Google Gemini** (`gemini-3.1-flash-lite`, free tier) | Zero cost, provider-agnostic wrapper so it can be swapped in one place. |
 | CRM | **Odoo Online**, XML-RPC external API | Free (One-App-Free), real integration via Odoo's official API. |
 | Email | **Gmail SMTP** (app password) | Zero cost, supports attachments, works immediately. |
 | Form source | **Mocked WordPress webhook** | The assignment explicitly permits a mock form payload; the webhook contract is the same either way. |
-| Packaging | **Docker + docker-compose** | `docker compose up` reproducibility. |
 
 **Token-cost minimization:** classification and question generation happen in
 a **single Gemini call** (not two), on the cheapest model, with a low
@@ -45,7 +46,7 @@ fraction of a cent — and development/testing runs entirely in `mock` mode
 - `POST /webhook/lead` requires a matching `X-Webhook-Secret` header —
   requests without it get `401`. Set `WEBHOOK_SECRET` in `.env`.
 - All secrets (Gemini key, Gmail app password, Odoo API key) load from
-  `.env`, which is git-ignored. `.env.example` documents every key.
+  `.env`, which is git-ignored.
 - Inbound data is validated with Pydantic before anything touches an
   external service.
 
@@ -60,15 +61,9 @@ queue (Celery/RQ/SQS) later without changing the calling code.
 ## Setup
 
 ```bash
-cp .env.example .env
-# fill in GEMINI_API_KEY, GMAIL_APP_PASSWORD, ODOO_URL/ODOO_DB/ODOO_API_KEY
+# fill in your keys in .env (GEMINI_API_KEY, GMAIL_APP_PASSWORD, ODOO_URL/ODOO_DB/ODOO_API_KEY)
 
-# Option A: Docker
-docker compose up --build
-
-# Option B: local venv
 pip install -r requirements.txt
-python scripts/make_pdf.py       # generates app/assets/Company_Profile.pdf
 uvicorn app.main:app --reload
 ```
 
@@ -119,8 +114,7 @@ app/
 │  └─ odoo.py            XML-RPC lead creation + dead-letter queue
 ├─ mocks/payloads.py    sample CF7-shaped fixtures
 └─ assets/Company_Profile.pdf
-scripts/make_pdf.py     generates the sample PDF
-tests/                  pytest suite (18 tests, fully offline)
+tests/                  pytest suite (21 tests, fully offline)
 ```
 
 See `AI_LOGIC.md` for the prompt engineering strategy and reliability design.

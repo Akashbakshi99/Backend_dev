@@ -26,7 +26,7 @@ def build_email(lead: NormalizedLead, ai: AIResult) -> EmailMessage:
 <p>To prepare an accurate proposal, could you help us with a few quick questions?</p>
 {_questions_html(ai.questions)}
 <p>Our Company Profile is attached. We'll be in touch shortly.</p>
-<p>Best regards,<br/>The Team</p>
+<p>Best regards,<br/>Bluechip Gulf Team</p>
 </body></html>"""
     msg.set_content("Thanks for reaching out. Please view this email in HTML.")
     msg.add_alternative(body, subtype="html")

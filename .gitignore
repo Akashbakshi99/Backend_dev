@@ -1,6 +1,6 @@
 .env
-__pycache__/
-*.pyc
-failed_leads.jsonl
-.venv/
 venv/
+__pycache__/
+.pytest_cache/
+failed_leads.jsonl
+*.log

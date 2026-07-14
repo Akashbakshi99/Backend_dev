@@ -16,6 +16,7 @@ class InboundForm(BaseModel):
     email: EmailStr
     message: str
     subject: str | None = None
+    phone: str | None = None
 
 
 class NormalizedLead(BaseModel):
@@ -23,6 +24,7 @@ class NormalizedLead(BaseModel):
     email: str
     message: str
     subject: str | None = None
+    phone: str | None = None
 
 
 class AIResult(BaseModel):

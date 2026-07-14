@@ -8,7 +8,7 @@ separate calls. This halves both token usage and API round-trips, keeps the
 service comfortably inside Gemini's free-tier rate limits, and avoids the
 extra latency and failure surface of a second network call.
 
-Model: `gemini-2.0-flash`, `temperature=0.2` (favors consistent, repeatable
+Model: `gemini-3.1-flash-lite`, `temperature=0.2` (favors consistent, repeatable
 classification over creative variation), `max_output_tokens=1024` (hard cap —
 the response can never balloon), `response_mime_type="application/json"`
 (forces structured output, no prose to parse around).
@@ -44,8 +44,12 @@ A fixed enum, not free text, so routing can't drift:
 | `mobile_development` | Mobile |
 | `ai_automation` | AI/Automation |
 | `consulting` | Consulting |
-| `needs_clarification` | Other (Review) |
+| `needs_clarification` | Other |
 | `other` | Other |
+
+Each department is also a real Odoo Sales Team (`crm.team`). `services/odoo.py::_find_team_id`
+looks up the team by this name and sets `team_id` on the `crm.lead` record, so routing is a
+structural CRM field, not just text in the description.
 
 ## Prompt engineering strategy (`app/core/prompts.py`)
 
