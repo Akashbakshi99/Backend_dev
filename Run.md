@@ -121,7 +121,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Jane Cooper",
+  "name": "Akash Bakshi",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+91 8899457781",
   "message": "We want an e-commerce website to sell about 200 products with Stripe payments and a blog."
@@ -130,7 +130,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Leo Martins",
+  "name": "Leo",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+1 312 447 8820",
   "message": "Our current WordPress site is outdated. We want a redesigned company website with a booking form and blog."
@@ -139,7 +139,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Hannah Weber",
+  "name": "Hannah",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+44 20 7946 0958",
   "message": "We want a custom online store built on Shopify with a product catalog and secure checkout."
@@ -159,7 +159,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Aisha Khan",
+  "name": "simran sharma",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+971 50 123 4567",
   "message": "Looking to build an Android and iOS delivery tracking app with live GPS and push notifications."
@@ -168,7 +168,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Diego Alvarez",
+  "name": "Alex",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+61 2 8123 4567",
   "message": "We are launching a food delivery startup and need a native iOS and Android app with real-time order tracking."
@@ -179,7 +179,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Meera Kapoor",
+  "name": "Meera",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+91 99870 33421",
   "message": "We want to automate our customer support with an AI-powered chatbot."
@@ -188,7 +188,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Tom Becker",
+  "name": "Tom",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+1 206 774 1190",
   "message": "We want an AI chatbot and workflow automation to handle repetitive email replies for our support team."
@@ -197,7 +197,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Yuki Tanaka",
+  "name": "Ayushi",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+49 30 1234 5678",
   "message": "We would like to build an LLM-based assistant to automate invoice processing and data entry."
@@ -208,7 +208,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "David Chen",
+  "name": "David",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+65 8123 4567",
   "message": "We run an established logistics business and want expert consulting on our internal processes, vendor contracts, and overall technology roadmap for the next few years."
@@ -217,7 +217,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Sara Oliveira",
+  "name": "Sara",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+55 11 96321 8890",
   "message": "We are a mid-sized manufacturing firm seeking strategic guidance on our overall digital transformation roadmap, team structure, and long-term technology investments."
@@ -226,7 +226,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Omar Farouk",
+  "name": "Sunil kumar",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+971 4 555 0132",
   "message": "Our logistics firm wants expert guidance on scaling operations, hiring strategy, and selecting the best software vendors for the next year."
@@ -237,7 +237,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Priya Nair",
+  "name": "Priya gupta",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+91 98765 43210",
   "message": "Can you help us source commercial furniture and office fit-out for our new branch?"
@@ -246,7 +246,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Marco Rossi",
+  "name": "Rosie",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+39 340 118 2299",
   "message": "Do you provide printed marketing brochures and branded merchandise for corporate events?"
@@ -255,7 +255,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Grace Mensah",
+  "name": "Mukash yadav",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+91 80 4123 6789",
   "message": "Do you offer event photography and video production services for our annual conference?"
@@ -270,7 +270,7 @@ are sample customer numbers; replace with any real value and that exact value la
 
 ```json
 {
-  "name": "Sam Lee",
+  "name": "Sam",
   "email": "akashbakshi.ai@gmail.com",
   "phone": "+1 646 220 7788",
   "message": "Hi, I have an idea."

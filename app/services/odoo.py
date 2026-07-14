@@ -1,10 +1,26 @@
+import asyncio
 import json
 import xmlrpc.client
 from tenacity import retry, stop_after_attempt, wait_exponential
 from app.schemas import NormalizedLead, AIResult
 from app.core.config import get_settings
-
 FAILED_LOG = "failed_leads.jsonl"
+
+# Cache the authenticated Odoo uid so we don't call authenticate() on every lead.
+_UID_CACHE: dict[tuple, int] = {}
+
+#Auth
+def _authenticate(settings) -> int:
+    key = (settings.odoo_url, settings.odoo_db, settings.odoo_username, settings.odoo_api_key)
+    uid = _UID_CACHE.get(key)
+    if uid:
+        return uid
+    common = xmlrpc.client.ServerProxy(f"{settings.odoo_url}/xmlrpc/2/common")
+    uid = common.authenticate(settings.odoo_db, settings.odoo_username, settings.odoo_api_key, {})
+    if not uid:
+        raise RuntimeError("Odoo authentication failed")
+    _UID_CACHE[key] = uid
+    return uid
 
 
 def _priority_from_confidence(confidence: float) -> str:
@@ -49,14 +65,30 @@ def _find_team_id(models, db: str, uid: int, api_key: str, department: str) -> i
     return ids[0] if ids else None
 
 
+def _find_or_create_partner(models, db: str, uid: int, api_key: str, vals: dict) -> int:
+    """Find a contact (res.partner) by email, or create one, so the lead's
+    'Contact' field (partner_id) is linked instead of empty."""
+    email = vals.get("email_from")
+    ids = models.execute_kw(
+        db, uid, api_key,
+        "res.partner", "search", [[["email", "=", email]]], {"limit": 1},
+    ) if email else []
+    if ids:
+        return ids[0]
+    return models.execute_kw(
+        db, uid, api_key,
+        "res.partner", "create",
+        [{"name": vals.get("contact_name") or email, "email": email, "phone": vals.get("phone")}],
+    )
+
+
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
 def _create_lead(vals: dict, department: str) -> int:
     settings = get_settings()
-    common = xmlrpc.client.ServerProxy(f"{settings.odoo_url}/xmlrpc/2/common")
-    uid = common.authenticate(settings.odoo_db, settings.odoo_username, settings.odoo_api_key, {})
-    if not uid:
-        raise RuntimeError("Odoo authentication failed")
+    uid = _authenticate(settings)  # cached after the first lead -- no re-login
     models = xmlrpc.client.ServerProxy(f"{settings.odoo_url}/xmlrpc/2/object")
+    partner_id = _find_or_create_partner(models, settings.odoo_db, uid, settings.odoo_api_key, vals)
+    vals = {**vals, "partner_id": partner_id}
     team_id = _find_team_id(models, settings.odoo_db, uid, settings.odoo_api_key, department)
     if team_id:
         vals = {**vals, "team_id": team_id}
@@ -66,15 +98,19 @@ def _create_lead(vals: dict, department: str) -> int:
     )
 
 
-def log_lead(lead: NormalizedLead, ai: AIResult) -> str:
+async def log_lead(lead: NormalizedLead, ai: AIResult) -> str:
     settings = get_settings()
     vals = build_lead_vals(lead, ai)
-    if settings.odoo_mode == "mock":
+    print(f"odoo.py : vals - {vals}")
+    if settings.odoo_mode == "mock":# overide into live
         return f"mock-{ai.category.value}"
     try:
-        record_id = _create_lead(vals, ai.department)
+        # thread to keep the event loop free.
+        record_id = await asyncio.to_thread(_create_lead, vals, ai.department)
+        print(f"record id - {record_id}")
         return str(record_id)
     except Exception:
         with open(FAILED_LOG, "a", encoding="utf-8") as fh:
             fh.write(json.dumps(vals) + "\n")
         return "queued"
+

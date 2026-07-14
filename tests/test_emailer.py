@@ -1,3 +1,5 @@
+import asyncio
+
 from app.schemas import NormalizedLead, AIResult, LeadCategory
 from app.services.emailer import build_email, send_lead_email
 
@@ -22,4 +24,4 @@ def test_send_lead_email_mock_mode(monkeypatch):
     monkeypatch.setenv("EMAIL_MODE", "mock")
     from app.core.config import get_settings
     get_settings.cache_clear()
-    assert send_lead_email(LEAD, AI) == "mock"
+    assert asyncio.run(send_lead_email(LEAD, AI)) == "mock"

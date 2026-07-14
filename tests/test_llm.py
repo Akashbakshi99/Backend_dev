@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 from app.schemas import NormalizedLead, LeadCategory
 from app.services.llm import parse_ai_json, fallback_result, generate_ai_result
@@ -28,6 +30,6 @@ def test_generate_ai_result_mock_mode_returns_valid_result(monkeypatch):
     monkeypatch.setenv("LLM_MODE", "mock")
     from app.core.config import get_settings
     get_settings.cache_clear()
-    result = generate_ai_result(LEAD)
+    result = asyncio.run(generate_ai_result(LEAD))
     assert result.department in {"Web", "Mobile", "AI/Automation", "Consulting", "Other"}
     assert result.questions

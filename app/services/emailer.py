@@ -1,3 +1,4 @@
+import asyncio
 import os
 import smtplib
 from email.message import EmailMessage
@@ -18,7 +19,7 @@ def build_email(lead: NormalizedLead, ai: AIResult) -> EmailMessage:
     msg = EmailMessage()
     msg["Subject"] = f"Thanks for contacting us about {ai.department}"
     msg["From"] = settings.gmail_address
-    msg["To"] = lead.email
+    msg["To"] = lead.email # send mail to user email.
     body = f"""<html><body>
 <p>Hi {lead.name or 'there'},</p>
 <p>Thanks for reaching out. We understand your inquiry as:
@@ -45,13 +46,16 @@ def _smtp_send(msg: EmailMessage) -> None:
     with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.starttls()
         server.login(settings.gmail_address, settings.gmail_app_password)
-        server.send_message(msg)
+        server.send_message(msg)# sending the message from company mail to user email.
 
 
-def send_lead_email(lead: NormalizedLead, ai: AIResult) -> str:
+async def send_lead_email(lead: NormalizedLead, ai: AIResult) -> str:
     settings = get_settings()
     msg = build_email(lead, ai)
     if settings.email_mode == "mock":
         return "mock"
-    _smtp_send(msg)
+    # smtplib is blocking (no async API), so run it in a worker thread
+    # to keep the event loop free.
+    print(f"Complete email JSON - {msg}")
+    await asyncio.to_thread(_smtp_send, msg)
     return "sent"

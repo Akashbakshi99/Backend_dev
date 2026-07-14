@@ -5,6 +5,7 @@ _CATEGORIES = (
     "needs_clarification, other"
 )
 
+# Few shot Prompting.
 _EXAMPLES = """
 Example 1:
 Message: "We need an online store to sell 200 products with card payments."

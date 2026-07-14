@@ -16,17 +16,33 @@ def health() -> dict[str, str]:
 
 #Entry point
 @app.post("/webhook/lead")
-def webhook_lead(form: InboundForm,background: BackgroundTasks,x_webhook_secret: str | None = Header(default=None),
+async def webhook_lead(form: InboundForm,background: BackgroundTasks,x_webhook_secret: str | None = Header(default=None),
 ) -> dict:
     settings = get_settings()
     if x_webhook_secret != settings.webhook_secret:
         raise HTTPException(status_code=401, detail="invalid webhook secret")
 
+    # Normalization of form
     lead = normalize(form)
+
+    # If the message < 3 words.
     if is_junk(lead):
         return {"status": "ignored", "reason": "junk"}
+    
+    print("-----Lead Info-------")
+    print(lead)
+    print("---------------------")
 
-    ai = generate_ai_result(lead)
+    ai = await generate_ai_result(lead)
+
+    print("-----Lead Info generate_ai_result function-------")
+    print(lead)
+    print("---------------------")
+
+    print("----AI-----")
+    print(ai)
+    print("-----------")
+    
     background.add_task(send_lead_email, lead, ai)
     background.add_task(log_lead, lead, ai)
 

@@ -1,3 +1,5 @@
+import asyncio
+
 from app.schemas import NormalizedLead, AIResult, LeadCategory
 from app.services.odoo import build_lead_vals, log_lead, _priority_from_confidence
 
@@ -40,4 +42,4 @@ def test_log_lead_mock_mode(monkeypatch):
     monkeypatch.setenv("ODOO_MODE", "mock")
     from app.core.config import get_settings
     get_settings.cache_clear()
-    assert log_lead(LEAD, AI) == "mock-web_development"
+    assert asyncio.run(log_lead(LEAD, AI)) == "mock-web_development"

@@ -6,7 +6,7 @@ from app.schemas import NormalizedLead, AIResult, LeadCategory
 from app.core.config import get_settings, DEPARTMENT_MAP
 from app.core.prompts import build_prompt
 
-
+# Clean the LLM response and extract the JSON object.
 def _extract_json_object(raw: str) -> str:
     fenced = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", raw, re.DOTALL)
     if fenced:
@@ -17,12 +17,16 @@ def _extract_json_object(raw: str) -> str:
     return raw
 
 
+# Extract the JSON object from the raw LLM response and convert it into a Python dictionary..
 def parse_ai_json(raw: str, lead: NormalizedLead) -> AIResult:
     try:
-        data = json.loads(_extract_json_object(raw))
+        data = json.loads(_extract_json_object(raw))# Converting json into python dict
+        print("-----------")
+        print(f"LLM clean data :- {data}")
+        print("-----------")
     except json.JSONDecodeError as exc:
         raise ValueError(f"invalid JSON from model: {exc}") from exc
-    category = LeadCategory(data["category"])
+    category = LeadCategory(data["category"])# fetching catagory value from data
     return AIResult(
         intent=str(data.get("intent", "general_inquiry")),
         category=category,
@@ -47,7 +51,8 @@ def fallback_result(lead: NormalizedLead) -> AIResult:
         ],
     )
 
-
+# mock result is the offline stand-in for the Gemini LLM 
+# It fakes the AI classification
 def _mock_result(lead: NormalizedLead) -> AIResult:
     text = lead.message.lower()
     if any(w in text for w in ("app", "ios", "android")):
@@ -73,7 +78,7 @@ def _mock_result(lead: NormalizedLead) -> AIResult:
         ],
     )
 
-
+#It decides whether to try calling Gemini again when the call fails and it automatically called internally by tenacity.
 def _is_transient_gemini_error(exc: BaseException) -> bool:
     from google.api_core import exceptions as google_exceptions
 
@@ -86,22 +91,22 @@ def _is_transient_gemini_error(exc: BaseException) -> bool:
         TimeoutError,
         ConnectionError,
     ))
-
-
+# registering.
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=1, max=8),
     retry=retry_if_exception(_is_transient_gemini_error),
     reraise=True,
 )
-def _call_gemini(prompt: str) -> str:
+
+async def _call_gemini(prompt: str) -> str:
     import google.generativeai as genai
 
     settings = get_settings()
     genai.configure(api_key=settings.gemini_api_key)
     model = genai.GenerativeModel("gemini-3.1-flash-lite")
     try:
-        response = model.generate_content(
+        response = await model.generate_content_async(
             prompt,
             generation_config={
                 "temperature": 0.2,
@@ -110,19 +115,24 @@ def _call_gemini(prompt: str) -> str:
             },
         )
     except Exception:
-        response = model.generate_content(
+        response = await model.generate_content_async(
             prompt,
             generation_config={"temperature": 0.2, "max_output_tokens": 1024},
         )
     return response.text
 
 
-def generate_ai_result(lead: NormalizedLead) -> AIResult:
+async def generate_ai_result(lead: NormalizedLead) -> AIResult:
     settings = get_settings()
     if settings.llm_mode == "mock":
         return _mock_result(lead)
+
     try:
-        raw = _call_gemini(build_prompt(lead))
+        print(f"IN LLM.PY file (lead data): - {lead}")
+        raw = await _call_gemini(build_prompt(lead))
+        print("--------")
+        print(f"In LLM.PY raw by llm - {raw}")
+        print("--------")
         return parse_ai_json(raw, lead)
     except Exception as exc:
         logging.getLogger(__name__).warning("Gemini call failed, using fallback: %s", exc)
